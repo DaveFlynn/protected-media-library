@@ -1,0 +1,85 @@
+/* Editor styles for Protected Gallery. */
+
+.wp-block-pml-protected-gallery {
+	position: relative;
+}
+.wp-block-pml-protected-gallery .pml-protected-badge {
+	position: absolute;
+	top: 6px;
+	left: 6px;
+	background: #b32d2e;
+	color: #fff;
+	font-size: 10px;
+	font-weight: 600;
+	padding: 2px 7px;
+	border-radius: 10px;
+	z-index: 2;
+	pointer-events: none;
+}
+
+.pml-gallery-grid {
+	display: grid;
+	gap: 8px;
+	padding: 24px 8px 8px;
+	outline: 2px solid rgba( 179, 45, 46, 0.4 );
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+.pml-gallery-item {
+	margin: 0;
+	position: relative;
+	background: #f6f7f7;
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.pml-gallery-item img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.pml-gallery-grid.is-cropped .pml-gallery-item {
+	aspect-ratio: 1 / 1;
+}
+.pml-gallery-grid.is-cropped .pml-gallery-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.pml-gallery-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 80px;
+	color: #50575e;
+	font-size: 20px;
+}
+
+.pml-gallery-remove {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	background: rgba( 0, 0, 0, 0.6 );
+	color: #fff;
+	border: none;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 1;
+	padding: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+}
+.pml-gallery-item:hover .pml-gallery-remove,
+.pml-gallery-item:focus-within .pml-gallery-remove {
+	display: flex;
+}
+.pml-gallery-remove:hover {
+	background: #b32d2e;
+}

@@ -1,0 +1,72 @@
+/* Frontend styles for Protected Gallery. */
+
+.wp-block-pml-protected-gallery {
+	margin: 0 0 1.5em;
+}
+
+.wp-block-pml-protected-gallery .pml-gallery-grid {
+	display: grid;
+	gap: 8px;
+}
+
+.wp-block-pml-protected-gallery .pml-gallery-item {
+	margin: 0;
+	background: #f6f7f7;
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.wp-block-pml-protected-gallery .pml-gallery-item img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.wp-block-pml-protected-gallery .pml-gallery-grid.is-cropped .pml-gallery-item {
+	aspect-ratio: 1 / 1;
+}
+.wp-block-pml-protected-gallery .pml-gallery-grid.is-cropped .pml-gallery-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* Locked state — anon viewer. */
+.wp-block-pml-protected-gallery.is-locked .pml-gallery-locked {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 16px 18px;
+	background: repeating-linear-gradient(
+		45deg,
+		#fcf0f1,
+		#fcf0f1 12px,
+		#f6e0e1 12px,
+		#f6e0e1 24px
+	);
+	border: 1px solid #f1c5c7;
+	border-radius: 6px;
+	color: #b32d2e;
+	text-decoration: none;
+}
+.wp-block-pml-protected-gallery.is-locked .pml-gallery-locked:hover {
+	color: #8c1f20;
+}
+.pml-gallery-locked-icon {
+	font-size: 28px;
+	line-height: 1;
+	flex: 0 0 auto;
+}
+.pml-gallery-locked-text {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.pml-gallery-locked-text strong {
+	font-weight: 600;
+}
+.pml-gallery-locked-text span {
+	font-size: 0.9em;
+	opacity: 0.85;
+}

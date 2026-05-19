@@ -1,0 +1,91 @@
+/* Frontend styles for Protected Video block. */
+
+.wp-block-pml-protected-video {
+	margin: 0 0 1.5em;
+}
+
+.wp-block-pml-protected-video .pml-video-card {
+	padding: 14px 16px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+}
+
+.wp-block-pml-protected-video .pml-video-title {
+	font-weight: 600;
+	color: #1d2327;
+	font-size: 1.05em;
+	margin-bottom: 8px;
+}
+
+.wp-block-pml-protected-video .pml-video-player {
+	width: 100%;
+	height: auto;
+	display: block;
+	background: #000;
+	border-radius: 3px;
+}
+
+.wp-block-pml-protected-video .pml-video-filename {
+	font-size: 0.85em;
+	color: #50575e;
+	margin-top: 6px;
+}
+
+.wp-block-pml-protected-video .pml-video-download {
+	display: inline-block;
+	margin-top: 10px;
+	padding: 6px 14px;
+	background: #2271b1;
+	color: #fff;
+	border-radius: 3px;
+	text-decoration: none;
+	font-size: 0.9em;
+	font-weight: 500;
+}
+.wp-block-pml-protected-video .pml-video-download:hover {
+	background: #135e96;
+}
+
+/* Locked state — anon viewer can't access the video. */
+.wp-block-pml-protected-video.is-locked .pml-video-locked {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 16px 18px;
+	background: #fcf0f1;
+	border: 1px solid #f1c5c7;
+	border-radius: 6px;
+}
+.pml-video-locked-icon {
+	font-size: 28px;
+	line-height: 1;
+	flex: 0 0 auto;
+}
+.pml-video-locked-text {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.pml-video-locked-text strong {
+	color: #b32d2e;
+}
+.pml-video-locked-text span {
+	color: #50575e;
+	font-size: 0.9em;
+}
+.pml-video-locked-button {
+	flex: 0 0 auto;
+	display: inline-block;
+	padding: 8px 16px;
+	background: #b32d2e;
+	color: #fff;
+	border-radius: 3px;
+	text-decoration: none;
+	font-weight: 500;
+}
+.pml-video-locked-button:hover {
+	background: #8c1f20;
+	color: #fff;
+}

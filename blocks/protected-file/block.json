@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "pml/protected-file",
+  "version": "0.1.0",
+  "title": "Protected File",
+  "category": "media",
+  "icon": "media-default",
+  "description": "Insert a download link for a file from the Protected Media library. Files live outside public uploads and are served only to authenticated users.",
+  "keywords": ["file", "download", "protected", "secure", "pdf", "document"],
+  "textdomain": "protected-media-library",
+  "attributes": {
+    "id":             { "type": "number" },
+    "url":            { "type": "string" },
+    "filename":       { "type": "string", "default": "" },
+    "displayText":    { "type": "string", "default": "" },
+    "mime":           { "type": "string", "default": "" },
+    "showDownloadButton": { "type": "boolean", "default": true },
+    "showInlinePreview":  { "type": "boolean", "default": true },
+    "previewHeight":      { "type": "number",  "default": 600 }
+  },
+  "supports": {
+    "anchor": true,
+    "align":  ["left", "center", "right", "wide", "full"],
+    "html":   false
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle":  ["file:./editor.css", "pml-picker"],
+  "style":        "file:./style.css",
+  "render":       "file:./render.php"
+}

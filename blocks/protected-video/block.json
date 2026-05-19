@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "pml/protected-video",
+  "version": "0.1.0",
+  "title": "Protected Video",
+  "category": "media",
+  "icon": "format-video",
+  "description": "Embed a video file from the Protected Media library. Streamed only to authenticated users; range support enables seeking.",
+  "keywords": ["video", "protected", "secure", "members", "sermon"],
+  "textdomain": "protected-media-library",
+  "attributes": {
+    "id":          { "type": "number" },
+    "url":         { "type": "string" },
+    "filename":    { "type": "string", "default": "" },
+    "displayText": { "type": "string", "default": "" },
+    "mime":        { "type": "string", "default": "" },
+    "posterId":    { "type": "number" },
+    "posterUrl":   { "type": "string", "default": "" },
+    "preload":     { "type": "string", "default": "metadata", "enum": ["none", "metadata", "auto"] },
+    "loop":        { "type": "boolean", "default": false },
+    "muted":       { "type": "boolean", "default": false },
+    "playsInline": { "type": "boolean", "default": false },
+    "showDownloadButton": { "type": "boolean", "default": false }
+  },
+  "supports": {
+    "anchor": true,
+    "align":  ["left", "center", "right", "wide", "full"],
+    "html":   false
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle":  ["file:./editor.css", "pml-picker"],
+  "style":        "file:./style.css",
+  "render":       "file:./render.php"
+}

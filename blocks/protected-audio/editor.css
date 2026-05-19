@@ -1,0 +1,50 @@
+/* Editor styles for Protected Audio block. */
+
+.wp-block-pml-protected-audio {
+	position: relative;
+}
+.wp-block-pml-protected-audio .pml-protected-badge {
+	position: absolute;
+	top: 6px;
+	left: 6px;
+	background: #b32d2e;
+	color: #fff;
+	font-size: 10px;
+	font-weight: 600;
+	padding: 2px 7px;
+	border-radius: 10px;
+	z-index: 2;
+	pointer-events: none;
+}
+
+.pml-audio-card {
+	padding: 14px 16px 14px 90px;
+	background: #f6f7f7;
+	border: 2px solid rgba( 179, 45, 46, 0.4 );
+	border-radius: 6px;
+}
+
+.pml-audio-title {
+	font-weight: 600;
+	color: #1d2327;
+	font-size: 16px;
+	margin-bottom: 8px;
+	min-height: 1.2em;
+}
+
+.pml-audio-player {
+	width: 100%;
+	display: block;
+}
+
+.pml-audio-filename {
+	font-size: 12px;
+	color: #50575e;
+	margin-top: 6px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Picker styles live in assets/css/picker.css (loaded via the
+   pml-picker style handle, declared in block.json editorStyle). */

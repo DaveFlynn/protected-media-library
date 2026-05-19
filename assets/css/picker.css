@@ -1,0 +1,224 @@
+/**
+ * Shared picker styles. Loaded once via the `pml-picker` style handle,
+ * referenced by each block's editorStyle in block.json.
+ *
+ * Used by: protected-image (grid mode), protected-file (list mode),
+ * protected-audio (list mode), and any future block via wp.pmlPicker.
+ */
+
+.pml-picker-modal .components-modal__frame {
+	max-width: min( 1100px, 92vw );
+	width: 92vw;
+}
+.pml-picker-modal .components-modal__content {
+	min-width: 0;
+}
+
+.pml-picker-toolbar {
+	display: flex;
+	align-items: flex-end;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+.pml-picker-toolbar .components-base-control {
+	flex: 1;
+	margin-bottom: 0;
+}
+
+/* Grid mode (image picker). */
+.pml-picker-grid {
+	display: grid;
+	grid-template-columns: repeat( auto-fill, minmax( 140px, 1fr ) );
+	gap: 12px;
+	max-height: 520px;
+	overflow: auto;
+	padding: 4px;
+}
+.pml-picker-item {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	background: #f6f7f7;
+	border: 2px solid transparent;
+	border-radius: 4px;
+	padding: 6px;
+	cursor: pointer;
+	text-align: left;
+}
+.pml-picker-item:hover,
+.pml-picker-item:focus {
+	border-color: #2271b1;
+	outline: none;
+}
+.pml-picker-item-image {
+	display: block;
+	background: #fff;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	overflow: hidden;
+	border-radius: 2px;
+	margin-bottom: 6px;
+}
+.pml-picker-item-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+.pml-picker-item-title {
+	font-size: 12px;
+	color: #1d2327;
+	line-height: 1.3;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* List mode (file / audio / video). */
+.pml-picker-list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	max-height: 520px;
+	overflow: auto;
+	padding: 4px;
+}
+.pml-picker-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 12px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	cursor: pointer;
+	text-align: left;
+}
+.pml-picker-row:hover,
+.pml-picker-row:focus {
+	border-color: #2271b1;
+	background: #f6fafd;
+	outline: none;
+}
+.pml-picker-row-icon {
+	font-size: 22px;
+	line-height: 1;
+	flex: 0 0 auto;
+	width: 40px;
+	text-align: center;
+}
+.pml-picker-row-thumb {
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	background: #f6f7f7;
+	border-radius: 2px;
+	overflow: hidden;
+	display: block;
+}
+.pml-picker-row-thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+.pml-picker-item-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	font-size: 40px;
+}
+.pml-picker-row-meta {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+.pml-picker-row-title {
+	font-weight: 600;
+	color: #1d2327;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.pml-picker-row-mime {
+	font-size: 11px;
+	color: #50575e;
+}
+
+/* Multi-select markers. */
+.pml-picker-item {
+	position: relative;
+}
+.pml-picker-item.is-selected {
+	border-color: #2271b1;
+	background: #f0f6fc;
+}
+.pml-picker-item-check {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	width: 22px;
+	height: 22px;
+	background: #2271b1;
+	color: #fff;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+	line-height: 1;
+}
+.pml-picker-row.is-selected {
+	border-color: #2271b1;
+	background: #f0f6fc;
+}
+.pml-picker-row-check {
+	margin-left: auto;
+	width: 22px;
+	height: 22px;
+	background: #2271b1;
+	color: #fff;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+	line-height: 1;
+	flex: 0 0 auto;
+}
+
+/* Multi-select commit footer. */
+.pml-picker-multi-footer {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 16px;
+	padding-top: 12px;
+	border-top: 1px solid #dcdcde;
+}
+.pml-picker-multi-count {
+	flex: 1 1 auto;
+	font-size: 13px;
+	color: #50575e;
+}
+
+/* Pager + states. */
+.pml-picker-pager {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	justify-content: center;
+	margin-top: 16px;
+}
+.pml-picker-loading,
+.pml-picker-empty,
+.pml-picker-error {
+	padding: 40px;
+	text-align: center;
+	color: #50575e;
+}
+.pml-picker-error {
+	color: #b32d2e;
+}

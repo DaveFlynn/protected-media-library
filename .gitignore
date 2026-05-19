@@ -1,0 +1,15 @@
+# Generated on activation — site-specific.
+handler-config.php
+
+# Local debugging.
+pml-debug.log
+
+# macOS / editor noise.
+.DS_Store
+*.swp
+*~
+
+# Node / build artifacts (not used today, future-proofing).
+node_modules/
+build/
+*.log

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "pml/protected-gallery",
+  "version": "0.1.0",
+  "title": "Protected Gallery",
+  "category": "media",
+  "icon": "format-gallery",
+  "description": "A gallery of protected images. Stored outside public uploads; rendered only for authenticated viewers.",
+  "keywords": ["gallery", "images", "protected", "members"],
+  "textdomain": "protected-media-library",
+  "attributes": {
+    "ids":      { "type": "array", "default": [], "items": { "type": "number" } },
+    "columns":  { "type": "number", "default": 3, "minimum": 1, "maximum": 8 },
+    "imageCrop": { "type": "boolean", "default": true }
+  },
+  "supports": {
+    "anchor": true,
+    "align":  ["wide", "full"],
+    "html":   false
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle":  ["file:./editor.css", "pml-picker"],
+  "style":        "file:./style.css",
+  "render":       "file:./render.php"
+}

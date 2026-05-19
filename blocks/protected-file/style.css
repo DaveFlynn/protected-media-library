@@ -1,0 +1,101 @@
+/* Front-end styles for Protected File block. */
+
+.wp-block-pml-protected-file {
+	margin: 0 0 1.5em;
+}
+
+.wp-block-pml-protected-file .pml-file-preview {
+	display: block;
+	width: 100%;
+	min-height: 200px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+	margin-bottom: 10px;
+}
+
+.wp-block-pml-protected-file .pml-file-card {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 14px 16px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+}
+
+.wp-block-pml-protected-file .pml-file-meta {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.wp-block-pml-protected-file .pml-file-link {
+	display: block;
+	font-weight: 600;
+	color: #1d2327;
+	text-decoration: underline;
+}
+
+.wp-block-pml-protected-file .pml-file-filename {
+	display: block;
+	font-size: 0.85em;
+	color: #50575e;
+	margin-top: 2px;
+}
+
+.wp-block-pml-protected-file .pml-file-button {
+	flex: 0 0 auto;
+	display: inline-block;
+	padding: 8px 16px;
+	background: #2271b1;
+	color: #fff;
+	border-radius: 3px;
+	text-decoration: none;
+	font-weight: 500;
+}
+.wp-block-pml-protected-file .pml-file-button:hover {
+	background: #135e96;
+}
+
+/* Locked state — shown when the visitor can't view the file. */
+.wp-block-pml-protected-file.is-locked .pml-file-locked {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 16px 18px;
+	background: #fcf0f1;
+	border: 1px solid #f1c5c7;
+	border-radius: 6px;
+}
+.pml-file-locked-icon {
+	font-size: 26px;
+	line-height: 1;
+	flex: 0 0 auto;
+}
+.pml-file-locked-text {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.pml-file-locked-text strong {
+	color: #b32d2e;
+}
+.pml-file-locked-text span {
+	color: #50575e;
+	font-size: 0.9em;
+}
+.pml-file-locked-button {
+	flex: 0 0 auto;
+	display: inline-block;
+	padding: 8px 16px;
+	background: #b32d2e;
+	color: #fff;
+	border-radius: 3px;
+	text-decoration: none;
+	font-weight: 500;
+}
+.pml-file-locked-button:hover {
+	background: #8c1f20;
+	color: #fff;
+}

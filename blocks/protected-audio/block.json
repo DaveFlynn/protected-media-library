@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "pml/protected-audio",
+  "version": "0.1.0",
+  "title": "Protected Audio",
+  "category": "media",
+  "icon": "format-audio",
+  "description": "Embed an audio file from the Protected Media library (sermon, podcast episode, member-only recording). Streamed only to authenticated users.",
+  "keywords": ["audio", "podcast", "sermon", "protected", "secure", "members"],
+  "textdomain": "protected-media-library",
+  "attributes": {
+    "id":          { "type": "number" },
+    "url":         { "type": "string" },
+    "filename":    { "type": "string", "default": "" },
+    "displayText": { "type": "string", "default": "" },
+    "mime":        { "type": "string", "default": "" },
+    "preload":     { "type": "string", "default": "metadata", "enum": ["none", "metadata", "auto"] },
+    "loop":        { "type": "boolean", "default": false },
+    "showDownloadButton": { "type": "boolean", "default": false }
+  },
+  "supports": {
+    "anchor": true,
+    "align":  ["left", "center", "right", "wide", "full"],
+    "html":   false
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle":  ["file:./editor.css", "pml-picker"],
+  "style":        "file:./style.css",
+  "render":       "file:./render.php"
+}
