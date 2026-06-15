@@ -84,12 +84,11 @@ add_action( 'acf/include_field_types', static function () {
 // Each GitHub Release tagged "vX.Y.Z" (with a matching plugin-header Version)
 // shows up as an available update in wp-admin. PUC uses the latest Release by
 // default and downloads its source zip — no build/asset upload required.
-// TODO: replace CHANGEME with the real repo owner before the first release.
 if ( file_exists( PML_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php' ) ) {
 	require_once PML_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php';
 
 	YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
-		'https://github.com/CHANGEME/protected-media-library/',
+		'https://github.com/DaveFlynn/protected-media-library/',
 		PML_FILE,
 		PML_SLUG
 	);
