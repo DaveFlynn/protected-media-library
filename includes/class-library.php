@@ -213,11 +213,15 @@ class PML_Library {
 	 *     referer guessing)
 	 */
 	public static function inject_protected_mode_script(): void {
+		$add_url   = admin_url( 'admin.php?page=' . self::ADD_PAGE_SLUG );
+		$add_label = __( 'Add Protected Media File', 'protected-media-library' );
 		?>
 		<script>
 		(function () {
 			var MODE_KEY = 'pml_mode';
 			var MODE_VAL = 'protected';
+			var ADD_URL   = <?php echo wp_json_encode( $add_url ); ?>;
+			var ADD_LABEL = <?php echo wp_json_encode( $add_label ); ?>;
 
 			// Only touch links that are the grid/list view-switcher — they're
 			// the ones that drop our query var while staying on this library.
@@ -233,8 +237,23 @@ class PML_Library {
 				} );
 			}
 
+			// Core's "Add Media File" button on upload.php is hardcoded to
+			// media-new.php (the PUBLIC uploader) with no server-side filter.
+			// On the Protected Library page that's a trap — it silently uploads
+			// to public storage. Repoint it at our protected uploader instead.
+			function rewriteAddButton( root ) {
+				if ( ! root || ! root.querySelectorAll ) { return; }
+				root.querySelectorAll( '.wrap .page-title-action' ).forEach( function ( a ) {
+					if ( a.getAttribute( 'data-pml-repointed' ) ) { return; }
+					a.setAttribute( 'href', ADD_URL );
+					a.textContent = ADD_LABEL;
+					a.setAttribute( 'data-pml-repointed', '1' );
+				} );
+			}
+
 			document.addEventListener( 'DOMContentLoaded', function () {
 				rewriteLinks( document );
+				rewriteAddButton( document );
 
 				// wp.media.model.Query.prototype.sync is what actually issues
 				// the `query-attachments` AJAX. It serializes this.args into
@@ -254,7 +273,7 @@ class PML_Library {
 				var observer = new MutationObserver( function ( mutations ) {
 					mutations.forEach( function ( m ) {
 						m.addedNodes.forEach( function ( n ) {
-							if ( n.nodeType === 1 ) { rewriteLinks( n ); }
+							if ( n.nodeType === 1 ) { rewriteLinks( n ); rewriteAddButton( n ); }
 						} );
 					} );
 				} );

@@ -4,7 +4,7 @@ Tags: media, protected, members, downloads, gated content
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPLv2 or later
 
 A second, private media library that lives outside your public uploads folder. Files are streamed only to logged-in users — never reachable by a direct URL.
@@ -157,6 +157,13 @@ All sign-in links point to wp-login.php with a `redirect_to` parameter pre-fille
 * **Multisite:** not supported in v0.1.
 
 == Changelog ==
+
+= 0.1.2 =
+* Added a "Protected Image" ACF field type (`pml_protected_image`) — a drop-in replacement for ACF's native Image field that selects from / uploads to protected storage. Stores a plain attachment ID, so it is value-compatible with an existing image field. Registered only when ACF is active (no hard dependency).
+* Fixed protected files being orphaned on disk when an attachment is deleted: core's cleanup refuses to unlink files outside the docroot. The plugin now maps `get_attached_file()` to the real protected-storage path (also fixing Regenerate Thumbnails and other `get_attached_file()` callers) and removes the real files on `delete_attachment`.
+* Fixed activation under WP-CLI not installing the Apache fast-path: WP-CLI can't detect the server, so the server-dependent setup (root `.htaccess` block, leak self-test, delivery mode) is now deferred to the first real web request.
+* Fixed the "Add Media File" button on the Protected Library admin page pointing at the public uploader (it silently uploaded to public storage); it now points at the protected uploader.
+* Documented the `PML_STORAGE_PATH` constant as an explicit storage-location override for hosts where the auto-choice is wrong.
 
 = 0.1.1 =
 * Added Protected Video block + `[pml-video]` shortcode, with optional poster image, mute, plays-inline, and loop controls. Range support already shipped in 0.1 means seeking works.

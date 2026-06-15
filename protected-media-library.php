@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Protected Media Library
  * Description:       A parallel, physically-separated media library. Protected files live outside wp-content/uploads/ and are served through an authenticated fast-path handler.
- * Version:           0.1.0
+ * Version:           0.1.2
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Dave
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PML_VERSION', '0.1.1' );
+define( 'PML_VERSION', '0.1.2' );
 define( 'PML_FILE', __FILE__ );
 define( 'PML_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PML_URL', plugin_dir_url( __FILE__ ) );
@@ -54,6 +54,9 @@ require_once PML_DIR . 'includes/class-installer.php';
 register_activation_hook( __FILE__, [ 'PML_Installer', 'activate' ] );
 register_deactivation_hook( __FILE__, [ 'PML_Installer', 'deactivate' ] );
 
+// Finish server-dependent setup if activation ran under WP-CLI (see installer).
+add_action( 'admin_init', [ 'PML_Installer', 'maybe_finish_web_setup' ] );
+
 add_action( 'plugins_loaded', static function () {
 	PML_Storage::init();
 	PML_Rewrites::init();
@@ -67,3 +70,27 @@ add_action( 'plugins_loaded', static function () {
 	PML_Add_Page::init();
 	PML_Cache::init();
 } );
+
+// ACF integration is optional — register the "Protected Image" field type only
+// when ACF is active. No hard dependency on ACF otherwise.
+add_action( 'acf/include_field_types', static function () {
+	require_once PML_DIR . 'includes/class-acf-field-image.php';
+	if ( class_exists( 'PML_ACF_Field_Image' ) ) {
+		acf_register_field_type( 'PML_ACF_Field_Image' );
+	}
+} );
+
+// --- Automatic updates from the public GitHub repo (plugin-update-checker) ---
+// Each GitHub Release tagged "vX.Y.Z" (with a matching plugin-header Version)
+// shows up as an available update in wp-admin. PUC uses the latest Release by
+// default and downloads its source zip — no build/asset upload required.
+// TODO: replace CHANGEME with the real repo owner before the first release.
+if ( file_exists( PML_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php' ) ) {
+	require_once PML_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php';
+
+	YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+		'https://github.com/CHANGEME/protected-media-library/',
+		PML_FILE,
+		PML_SLUG
+	);
+}

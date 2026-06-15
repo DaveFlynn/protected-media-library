@@ -28,31 +28,49 @@ class PML_Storage {
 		// applies ID3 / EXIF overrides (audio files in particular: WP rewrites
 		// post_title to the ID3 "title" tag, which is often junk like "track 4").
 		add_filter( 'wp_generate_attachment_metadata', [ __CLASS__, 'restore_filename_title' ], 10, 2 );
+		// Resolve get_attached_file() to the real protected-storage path. Storage
+		// is only redirected via upload_dir DURING the upload request; on every
+		// later request WP would otherwise point at the standard uploads basedir,
+		// where the file does not exist. Fixes Regenerate Thumbnails, metadata
+		// re-runs, third-party get_attached_file() callers, and core's own
+		// delete routine's size/original resolution.
+		add_filter( 'get_attached_file', [ __CLASS__, 'filter_attached_file' ], 10, 2 );
+		// Delete the real files when a protected attachment is deleted. Core's
+		// wp_delete_attachment_files() containment-checks the MAIN file against
+		// the standard uploads basedir and so refuses to unlink anything outside
+		// the docroot, orphaning protected files on disk. We clean them up here.
+		add_action( 'delete_attachment', [ __CLASS__, 'cleanup_protected_files_on_delete' ] );
 	}
+
+	/** @var bool|null Per-request cache for request_is_protected(). */
+	private static $request_protected = null;
 
 	/**
 	 * Is the current request a protected upload? Looks at POST/GET for the
 	 * nonce field. Verified once and cached per-request.
 	 */
 	public static function request_is_protected(): bool {
-		static $cached = null;
-		if ( $cached !== null ) {
-			return $cached;
+		if ( self::$request_protected !== null ) {
+			return self::$request_protected;
 		}
 		$nonce_raw = $_REQUEST[ self::FLAG_FIELD ] ?? '';
 		$nonce     = is_string( $nonce_raw ) ? wp_unslash( $nonce_raw ) : '';
 		if ( $nonce && wp_verify_nonce( $nonce, self::NONCE_KEY ) ) {
-			return $cached = true;
+			return self::$request_protected = true;
 		}
 		// Explicit per-process flag set by code (e.g. REST upload handler).
 		if ( ! empty( $GLOBALS['pml_force_protected'] ) ) {
-			return $cached = true;
+			return self::$request_protected = true;
 		}
-		return $cached = false;
+		return self::$request_protected = false;
 	}
 
 	public static function force_protected_for_request(): void {
 		$GLOBALS['pml_force_protected'] = true;
+		// Anything that called wp_upload_dir() during boot (and almost
+		// everything does) has already cached a `false` answer; invalidate it
+		// so programmatic callers (CLI migrations, sideloads) take effect.
+		self::$request_protected = null;
 	}
 
 	public static function maybe_flag_upload( array $file ): array {
@@ -130,6 +148,86 @@ class PML_Storage {
 			] );
 		}
 		return $metadata;
+	}
+
+	/**
+	 * Map get_attached_file() for protected attachments onto PML_STORAGE_DIR.
+	 *
+	 * WP computes the incoming $file as `standard_uploads_basedir + relative`,
+	 * which is wrong for us — the bytes live under PML_STORAGE_DIR. We only
+	 * rewrite when the stored `_wp_attached_file` value is relative (the normal
+	 * case); absolute stored paths are passed through untouched.
+	 */
+	public static function filter_attached_file( $file, $attachment_id ) {
+		if ( ! self::is_protected( (int) $attachment_id ) ) {
+			return $file;
+		}
+		$rel = get_post_meta( (int) $attachment_id, '_wp_attached_file', true );
+		if ( ! is_string( $rel ) || $rel === '' ) {
+			return $file;
+		}
+		// Already absolute (*nix or Windows drive path)? Leave as stored.
+		if ( $rel[0] === '/' || preg_match( '|^[a-zA-Z]:\\\\|', $rel ) ) {
+			return $rel;
+		}
+		return rtrim( PML_STORAGE_DIR, '/' ) . '/' . ltrim( $rel, '/' );
+	}
+
+	/**
+	 * On deletion of a protected attachment, remove its files from protected
+	 * storage (main file + intermediate sizes + original_image).
+	 *
+	 * Fires on `delete_attachment`, before core's own file deletion. Core can
+	 * delete the sizes (it derives their directory from dirname($file)) but
+	 * NOT the main file — `wp_delete_file_from_directory( $file, basedir )` in
+	 * wp-includes/post.php containment-checks against the standard uploads
+	 * basedir, and our files live outside it. Deleting the full set here is
+	 * idempotent with whatever core manages to remove afterward.
+	 *
+	 * Every unlink is hard-scoped to within PML_STORAGE_DIR via realpath().
+	 */
+	public static function cleanup_protected_files_on_delete( $attachment_id ): void {
+		$attachment_id = (int) $attachment_id;
+		if ( ! self::is_protected( $attachment_id ) ) {
+			return;
+		}
+		$rel = get_post_meta( $attachment_id, '_wp_attached_file', true );
+		if ( ! is_string( $rel ) || $rel === '' ) {
+			return;
+		}
+
+		$base = rtrim( wp_normalize_path( PML_STORAGE_DIR ), '/' );
+		$full = $base . '/' . ltrim( wp_normalize_path( $rel ), '/' );
+		$dir  = dirname( $full );
+
+		$targets = [ $full ];
+
+		$meta = wp_get_attachment_metadata( $attachment_id );
+		if ( is_array( $meta ) ) {
+			if ( ! empty( $meta['sizes'] ) && is_array( $meta['sizes'] ) ) {
+				foreach ( $meta['sizes'] as $size ) {
+					if ( ! empty( $size['file'] ) ) {
+						$targets[] = $dir . '/' . $size['file'];
+					}
+				}
+			}
+			if ( ! empty( $meta['original_image'] ) ) {
+				$targets[] = $dir . '/' . $meta['original_image'];
+			}
+		}
+
+		foreach ( array_unique( $targets ) as $target ) {
+			$real = realpath( wp_normalize_path( $target ) );
+			if ( $real === false ) {
+				continue;
+			}
+			$real = wp_normalize_path( $real );
+			// Never unlink anything outside protected storage.
+			if ( strpos( $real, $base . '/' ) !== 0 ) {
+				continue;
+			}
+			@unlink( $real );
+		}
 	}
 
 	/* --------- helpers --------- */

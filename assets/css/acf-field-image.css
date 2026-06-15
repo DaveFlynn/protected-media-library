@@ -1,0 +1,44 @@
+/* ACF "Protected Image" field. */
+
+.pml-acf-image-preview {
+	margin-bottom: 8px;
+}
+
+.pml-acf-image-preview img {
+	max-width: 200px;
+	max-height: 200px;
+	height: auto;
+	display: block;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	background: #f6f7f7;
+}
+
+.pml-acf-image:not(.has-value) .pml-acf-image-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 200px;
+	height: 120px;
+	border: 1px dashed #c3c4c7;
+	border-radius: 4px;
+	background: #f6f7f7;
+	color: #646970;
+	font-size: 28px;
+	margin-bottom: 8px;
+}
+
+.pml-acf-image:not(.has-value) .pml-acf-image-preview::before {
+	content: "\1F512"; /* lock */
+}
+
+.pml-acf-image-actions {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.pml-acf-image-actions .pml-acf-image-remove {
+	color: #b32d2e;
+}

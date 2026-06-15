@@ -25,6 +25,7 @@ class PML_Installer {
 	const DELIVERY_OPTION      = 'pml_delivery_mode'; // 'fast' | 'fallback'
 	const STORAGE_DIR_OPTION   = 'pml_storage_dir';
 	const LEAK_OPTION          = 'pml_storage_leaks';
+	const PENDING_WEB_OPTION   = 'pml_pending_web_setup';
 
 	public static function activate(): void {
 		$results = [];
@@ -42,6 +43,13 @@ class PML_Installer {
 		$results['storage_ht']  = self::write_storage_htaccess( $path );
 		$results['handler_cfg'] = self::write_handler_config( $path );
 		$results['root_ht']     = self::write_root_htaccess();
+
+		// WP-CLI has no SERVER_SOFTWARE and no apache_get_modules(), so
+		// is_apache() returns false even on Apache hosts. Redo the
+		// server-dependent steps on the first real web request.
+		if ( 'not_apache' === $results['root_ht'] && PHP_SAPI === 'cli' ) {
+			update_option( self::PENDING_WEB_OPTION, 1 );
+		}
 
 		// 2. HTTP self-test: ensure the storage dir is NOT reachable via URL.
 		$results['leak_check'] = self::self_test_leak( $path );
@@ -62,18 +70,61 @@ class PML_Installer {
 		self::remove_root_htaccess_block();
 		flush_rewrite_rules( false );
 		delete_option( self::NOTICE_OPTION );
+		delete_option( self::PENDING_WEB_OPTION );
+	}
+
+	/**
+	 * Finish server-dependent setup deferred from a CLI activation.
+	 * Hooked on admin_init; runs once, in a real web context where
+	 * is_apache() can actually detect the server.
+	 */
+	public static function maybe_finish_web_setup(): void {
+		if ( PHP_SAPI === 'cli' || ! get_option( self::PENDING_WEB_OPTION ) ) {
+			return;
+		}
+		delete_option( self::PENDING_WEB_OPTION );
+
+		$results = get_option( self::NOTICE_OPTION, [] );
+		if ( ! is_array( $results ) ) {
+			$results = [];
+		}
+
+		$results['root_ht'] = self::write_root_htaccess();
+		$delivery = ( $results['root_ht'] === true ) ? 'fast' : 'fallback';
+		update_option( self::DELIVERY_OPTION, $delivery );
+
+		$path = get_option( self::STORAGE_DIR_OPTION );
+		if ( is_string( $path ) && $path !== '' ) {
+			$results['leak_check'] = self::self_test_leak( $path );
+			update_option( self::LEAK_OPTION, ! empty( $results['leak_check']['leaks'] ) );
+		}
+
+		update_option( self::NOTICE_OPTION, $results );
 	}
 
 	/* --------- storage location selection --------- */
 
 	/**
 	 * Pick the best storage path:
+	 *   0. PML_STORAGE_PATH constant, if defined — explicit override for hosts
+	 *      where the auto-choice is wrong (e.g. dirname(ABSPATH) is writable
+	 *      but ephemeral, as in Docker-based dev environments).
 	 *   1. dirname(ABSPATH) + suffix — outside docroot on most installs.
 	 *   2. WP_CONTENT_DIR/protected-uploads — always reachable, may leak on Nginx.
 	 *
 	 * Returns ['path' => string, 'outside_docroot' => bool].
 	 */
 	public static function choose_storage_dir(): array {
+		$docroot = self::normalized_docroot();
+
+		if ( defined( 'PML_STORAGE_PATH' ) && PML_STORAGE_PATH !== '' ) {
+			$cand = rtrim( wp_normalize_path( PML_STORAGE_PATH ), '/' );
+			return [
+				'path'            => $cand,
+				'outside_docroot' => $docroot !== '' && strpos( $cand, $docroot . '/' ) !== 0,
+			];
+		}
+
 		$suffix = '/pml-storage-' . substr( hash( 'sha256', wp_salt( 'auth' ) ), 0, 12 );
 
 		$candidates = [];
@@ -84,8 +135,6 @@ class PML_Installer {
 
 		// Fallback inside wp-content (always writable on a working WP install).
 		$candidates[] = WP_CONTENT_DIR . '/protected-uploads';
-
-		$docroot = self::normalized_docroot();
 
 		foreach ( $candidates as $cand ) {
 			// Can we create / write here?
