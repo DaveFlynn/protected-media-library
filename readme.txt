@@ -4,7 +4,7 @@ Tags: media, protected, members, downloads, gated content
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.1.4
+Stable tag: 0.1.5
 License: GPLv2 or later
 
 A second, private media library that lives outside your public uploads folder. Files are streamed only to logged-in users — never reachable by a direct URL.
@@ -157,6 +157,9 @@ All sign-in links point to wp-login.php with a `redirect_to` parameter pre-fille
 * **Multisite:** not supported in v0.1.
 
 == Changelog ==
+
+= 0.1.5 =
+* Fixed the 0.1.4 release itself never showing up as an available update: the plugin header's `Version:` line (what WordPress and the update checker actually read) was left at 0.1.3 by mistake while only the internal `PML_VERSION` constant was bumped, so installs on 0.1.3 correctly saw "no update available" and never got the 0.1.4 fix. No functional changes beyond the version bump.
 
 = 0.1.4 =
 * Fixed a critical bug where updating the plugin (via the built-in updater) broke all protected media delivery: `handler-config.php`, needed by the fast-path handler, was generated only at activation and lived inside the plugin's own directory — which WordPress's updater replaces wholesale on every update, silently deleting it. The file now lives in `wp-content/` (outside the replaced directory), and the plugin self-heals on the next admin page load after any update, re-checking anything activation would have set up. If you were on 0.1.2 or 0.1.3 and protected media stopped loading after updating, this fixes it going forward automatically.
