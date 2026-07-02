@@ -251,6 +251,27 @@ class PML_Library {
 				} );
 			}
 
+			// Core's media grid view binds its own drag-and-drop uploader to
+			// the window/document (Plupload, with no protected-storage routing
+			// and no visual feedback — it silently uploads to the PUBLIC
+			// library). We previously tried and abandoned patching that
+			// pipeline directly (see gotchas.md "Plupload nonce" note /
+			// class-add-page.php docblock) because timing into
+			// _wpPluploadSettings is fragile. Simplest safe fix: capture the
+			// drag/drop events on `document` BEFORE core's bubble-phase
+			// listeners run, and swallow them. Never touches Plupload
+			// internals — just wins the race for the event.
+			function blockNativeDropzone( e ) {
+				e.preventDefault();
+				e.stopImmediatePropagation();
+				if ( e.type === 'drop' ) {
+					window.alert( <?php echo wp_json_encode( __( 'Drag-and-drop upload is disabled on the Protected Library. Use "Add New File" to upload protected media.', 'protected-media-library' ) ); ?> );
+				}
+			}
+			[ 'dragenter', 'dragover', 'drop' ].forEach( function ( evt ) {
+				document.addEventListener( evt, blockNativeDropzone, true );
+			} );
+
 			document.addEventListener( 'DOMContentLoaded', function () {
 				rewriteLinks( document );
 				rewriteAddButton( document );
