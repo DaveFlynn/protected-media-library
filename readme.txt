@@ -4,7 +4,7 @@ Tags: media, protected, members, downloads, gated content
 Requires at least: 6.4
 Tested up to: 6.9
 Requires PHP: 8.1
-Stable tag: 0.1.2
+Stable tag: 0.1.3
 License: GPLv2 or later
 
 A second, private media library that lives outside your public uploads folder. Files are streamed only to logged-in users — never reachable by a direct URL.
@@ -157,6 +157,9 @@ All sign-in links point to wp-login.php with a `redirect_to` parameter pre-fille
 * **Multisite:** not supported in v0.1.
 
 == Changelog ==
+
+= 0.1.3 =
+* Fixed the native WordPress drag-and-drop dropzone on the Protected Library admin page (`upload.php?pml_mode=protected`) silently uploading files to the public library with no protected-storage routing and no visual feedback. Drag-and-drop on that page is now blocked with a message pointing to "Add New File".
 
 = 0.1.2 =
 * Added a "Protected Image" ACF field type (`pml_protected_image`) — a drop-in replacement for ACF's native Image field that selects from / uploads to protected storage. Stores a plain attachment ID, so it is value-compatible with an existing image field. Registered only when ACF is active (no hard dependency).

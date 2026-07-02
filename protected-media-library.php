@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Protected Media Library
  * Description:       A parallel, physically-separated media library. Protected files live outside wp-content/uploads/ and are served through an authenticated fast-path handler.
- * Version:           0.1.2
+ * Version:           0.1.3
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Dave
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PML_VERSION', '0.1.2' );
+define( 'PML_VERSION', '0.1.3' );
 define( 'PML_FILE', __FILE__ );
 define( 'PML_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PML_URL', plugin_dir_url( __FILE__ ) );
