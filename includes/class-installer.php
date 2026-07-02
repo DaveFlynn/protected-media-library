@@ -26,6 +26,7 @@ class PML_Installer {
 	const STORAGE_DIR_OPTION   = 'pml_storage_dir';
 	const LEAK_OPTION          = 'pml_storage_leaks';
 	const PENDING_WEB_OPTION   = 'pml_pending_web_setup';
+	const VERSION_OPTION       = 'pml_installed_version';
 
 	public static function activate(): void {
 		$results = [];
@@ -64,6 +65,37 @@ class PML_Installer {
 		flush_rewrite_rules( false );
 
 		update_option( self::NOTICE_OPTION, $results );
+		update_option( self::VERSION_OPTION, PML_VERSION );
+	}
+
+	/**
+	 * WordPress's plugin updater deletes and replaces PML_DIR wholesale on
+	 * every update and never re-fires register_activation_hook(). Anything
+	 * activate() generates that must survive an update (today: just
+	 * handler-config.php, written outside PML_DIR — see PML_HANDLER_CONFIG_FILE)
+	 * has to be re-checked here instead. Runs on admin_init; bails immediately
+	 * once the stored version matches, so the steady-state cost is one
+	 * get_option() call.
+	 */
+	public static function maybe_repair_after_update(): void {
+		$installed = get_option( self::VERSION_OPTION );
+		if ( $installed === PML_VERSION ) {
+			return;
+		}
+
+		$path = get_option( self::STORAGE_DIR_OPTION );
+		if ( is_string( $path ) && $path !== '' ) {
+			self::write_handler_config( $path );
+			// Old installs (pre-0.1.4) wrote this inside PML_DIR, which the
+			// update replace would have just wiped anyway — but clean up a
+			// stray copy if a partially-applied update left one behind.
+			$old = PML_DIR . 'handler-config.php';
+			if ( file_exists( $old ) ) {
+				@unlink( $old );
+			}
+		}
+
+		update_option( self::VERSION_OPTION, PML_VERSION );
 	}
 
 	public static function deactivate(): void {
@@ -232,7 +264,7 @@ HT;
 	/* --------- handler config (so standalone handler knows where storage lives) --------- */
 
 	public static function write_handler_config( string $storage_path ): bool {
-		$file = PML_DIR . 'handler-config.php';
+		$file = PML_HANDLER_CONFIG_FILE;
 		$body = "<?php\n// Auto-generated. Do not edit.\nreturn " . var_export(
 			[
 				'storage_dir'  => $storage_path,

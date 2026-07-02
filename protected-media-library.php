@@ -14,11 +14,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PML_VERSION', '0.1.3' );
+define( 'PML_VERSION', '0.1.4' );
 define( 'PML_FILE', __FILE__ );
 define( 'PML_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PML_URL', plugin_dir_url( __FILE__ ) );
 define( 'PML_SLUG', 'protected-media-library' );
+
+// Deliberately OUTSIDE PML_DIR: WordPress's plugin updater deletes and
+// replaces the entire plugin directory on every update (activation hooks do
+// NOT re-run), so anything generated at install time that must survive an
+// update cannot live inside PML_DIR. See PML_Installer::maybe_repair_after_update().
+define( 'PML_HANDLER_CONFIG_FILE', WP_CONTENT_DIR . '/pml-handler-config.php' );
 
 // Filesystem roots. The installer picks the best path (preferring outside the
 // document root) and persists it in the `pml_storage_dir` option. We resolve
@@ -56,6 +62,13 @@ register_deactivation_hook( __FILE__, [ 'PML_Installer', 'deactivate' ] );
 
 // Finish server-dependent setup if activation ran under WP-CLI (see installer).
 add_action( 'admin_init', [ 'PML_Installer', 'maybe_finish_web_setup' ] );
+
+// Self-heal anything an update might have wiped. WP's plugin updater replaces
+// PML_DIR wholesale and never re-fires the activation hook, so any
+// activation-time step (today: handler-config.php) is silently lost on
+// update unless something re-checks it. Runs on every admin page load but
+// bails immediately once the stored version matches — negligible cost.
+add_action( 'admin_init', [ 'PML_Installer', 'maybe_repair_after_update' ] );
 
 add_action( 'plugins_loaded', static function () {
 	PML_Storage::init();

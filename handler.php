@@ -16,7 +16,19 @@ declare( strict_types = 1 );
 // --- locate roots without WP ---
 // Config file written on activation. Carries the storage path (which may be
 // outside the docroot) so we don't have to guess.
-$cfg_file = __DIR__ . '/handler-config.php';
+//
+// Lives in wp-content/, NOT this plugin's own directory: WordPress's plugin
+// updater deletes and replaces this whole directory on every update (and
+// never re-fires the activation hook), so anything generated at install
+// time that must survive an update can't live in __DIR__. This file assumes
+// the standard wp-content/plugins/<slug>/handler.php layout to find it
+// without booting WP.
+$cfg_file = dirname( __DIR__, 2 ) . '/pml-handler-config.php';
+if ( ! is_readable( $cfg_file ) ) {
+	// Pre-0.1.4 installs (or a request that raced an in-progress update
+	// before the admin_init repair hook ran) may still have it here.
+	$cfg_file = __DIR__ . '/handler-config.php';
+}
 if ( ! is_readable( $cfg_file ) ) {
 	pml_handler_404();
 }
